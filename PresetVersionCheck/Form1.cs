@@ -14,6 +14,7 @@ using System.IO.Compression;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Xml;
+using Microsoft.Win32;
 
 namespace PresetVersionCheck
 {
@@ -78,27 +79,32 @@ namespace PresetVersionCheck
             Application.Exit();
         }
 
+        private void GetiItDone()
+        {
+            int start = 0;
+            int stop = 0;
+            string zResult = string.Empty;
+            string zVersion = string.Empty;
+            zFile = openFileDialog1.FileName;
+            AddLog("Preset file: " + zFile, listBox1);
+            AddLog("Opening Preset file for version check", listBox1);
+            UnComp();
+            zResult = GetVersion(zipPath + "\\Preset.xml");
+            AddLog(zResult, listBox1);
+            start = zResult.IndexOf("build");
+            stop = zResult.IndexOf("name");
+            zVersion = zResult.Substring(start, stop - start);
+            AddLog(zVersion, listBox1);
+            zVersion = zVersion.Substring(7, zVersion.Length - 9);
+
+            label1.Text = "Preset Version: " + zVersion;
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                int start = 0;
-                int stop = 0;
-                string zResult = string.Empty;
-                string zVersion = string.Empty;
-                zFile = openFileDialog1.FileName;
-                AddLog("Preset file: " + zFile, listBox1);
-                AddLog("Opening Preset file for version check", listBox1);
-                UnComp();
-                zResult = GetVersion(zipPath + "\\Preset.xml");
-                AddLog(zResult, listBox1);
-                start = zResult.IndexOf("build");
-                stop = zResult.IndexOf("name");
-                zVersion = zResult.Substring(start, stop - start);
-                AddLog(zVersion, listBox1);
-                zVersion = zVersion.Substring(7, zVersion.Length -9);
-
-                label1.Text = "Preset Version: " + zVersion;    
+                GetiItDone();
             }
         }
 
@@ -108,6 +114,39 @@ namespace PresetVersionCheck
             zFile = string.Empty;
             openFileDialog1.FileName = string.Empty;
             label1.Text = string.Empty;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            //Auto set default program to open edi format file
+            try
+            {
+                string currentSavedDefault = "";
+                using (RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"filetype\shell\open\command"))
+                {
+                    if (key != null)
+                    {
+                        currentSavedDefault = key.GetValue("").ToString();
+                    }
+                }
+                String myExecutable = Assembly.GetEntryAssembly().Location;
+                if (currentSavedDefault != myExecutable)
+                {
+                    Registry.ClassesRoot.CreateSubKey(".type").SetValue("", "filetype", Microsoft.Win32.RegistryValueKind.String);
+                    Registry.ClassesRoot.CreateSubKey(@"filetype\shell\open\command").SetValue("", myExecutable + " %1", Microsoft.Win32.RegistryValueKind.String);
+                }
+            }
+
+            catch (Exception)
+            {
+            }
+    string[] args = Environment.GetCommandLineArgs();
+
+                if (args.Length > 1)
+                {
+                    zFile  = args[1];
+                    GetiItDone();
+                }
         }
     }
 }
