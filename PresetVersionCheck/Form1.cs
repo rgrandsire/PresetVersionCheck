@@ -2,8 +2,10 @@
 ##############################################################################################################################################################
 #   Date      #  Version   #     Author        #                               Comments                                                                      #
 ##############################################################################################################################################################
-# 06/03/2021  # 1.0.0.0    # Remi G Grandsire  #  Initial development                                                                                        #
-#_____________#____________#___________________#_____________________________________________________________________________________________________________#
+# 06/03/2021  # 1.0.0.0    # Remi G Grandsire   #  Initial development                                                                                       #
+# 06/08/2021  # 1.0.0.1    # Remi G Grandsire   # Added: display version                                                                                     #
+#             #            #                    # Save file as with version added                                                                            #
+##############################################################################################################################################################
 
 
 */
@@ -15,6 +17,8 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Xml;
 using Microsoft.Win32;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace PresetVersionCheck
 {
@@ -26,6 +30,7 @@ namespace PresetVersionCheck
         }
         private string zFile = string.Empty;
         private string zipPath = "C:\\temp\\RemUnzip";
+        private string zVersion = string.Empty;
 
 
         private string GetVersion(string xmlFile)
@@ -76,6 +81,21 @@ namespace PresetVersionCheck
 
         private void button1_Click(object sender, EventArgs e)
         {
+            // Let's sdave the file with the version if needed
+            if (checkBox1.Checked)
+            {
+                zFile = Path.GetFileNameWithoutExtension(zFile);
+                
+                if (!zFile.Contains("V1_0_"))
+                {
+                    zVersion = zVersion.Replace('.', '_');
+                    zFile += "V" + zVersion +".mpt";
+                    AddLog(zFile, listBox1);
+                    saveFileDialog1.FileName = zFile;
+                    saveFileDialog1.ShowDialog();
+                }
+            }
+
             Application.Exit();
         }
 
@@ -84,7 +104,7 @@ namespace PresetVersionCheck
             int start = 0;
             int stop = 0;
             string zResult = string.Empty;
-            string zVersion = string.Empty;
+            
             zFile = openFileDialog1.FileName;
             AddLog("Preset file: " + zFile, listBox1);
             AddLog("Opening Preset file for version check", listBox1);
@@ -118,7 +138,6 @@ namespace PresetVersionCheck
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //Auto set default program to open edi format file
             try
             {
                 string currentSavedDefault = "";
