@@ -92,7 +92,11 @@ namespace PresetVersionCheck
                     zFile += "V" + zVersion +".mpt";
                     AddLog(zFile, listBox1);
                     saveFileDialog1.FileName = zFile;
-                    saveFileDialog1.ShowDialog();
+                    if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                    {
+                        File.Move(openFileDialog1.FileName, saveFileDialog1.FileName);
+                    }
+
                 }
             }
 
@@ -164,6 +168,7 @@ namespace PresetVersionCheck
                 if (args.Length > 1)
                 {
                     zFile  = args[1];
+                    openFileDialog1.FileName = zFile;
                     GetiItDone();
                 }
         }
