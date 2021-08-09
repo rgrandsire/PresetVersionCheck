@@ -5,6 +5,8 @@
 # 06/03/2021  # 1.0.0.0    # Remi G Grandsire   #  Initial development                                                                                       #
 # 06/08/2021  # 1.0.0.1    # Remi G Grandsire   # Added: display version                                                                                     #
 #             #            #                    # Save file as with version added                                                                            #
+# 08/09/2021  # 1.0.0.2    # Remi G Grandsire   # Set default dir to the download folder                                                                     #
+#             #            #                    # Do not save if no file was open or version was not found                                                   #
 ##############################################################################################################################################################
 
 
@@ -82,7 +84,7 @@ namespace PresetVersionCheck
         private void button1_Click(object sender, EventArgs e)
         {
             // Let's sdave the file with the version if needed
-            if (checkBox1.Checked)
+            if (checkBox1.Checked && zVersion != string.Empty)
             {
                 zFile = Path.GetFileNameWithoutExtension(zFile);
                 
@@ -108,7 +110,7 @@ namespace PresetVersionCheck
             int start = 0;
             int stop = 0;
             string zResult = string.Empty;
-            
+
             zFile = openFileDialog1.FileName;
             AddLog("Preset file: " + zFile, listBox1);
             AddLog("Opening Preset file for version check", listBox1);
@@ -126,6 +128,12 @@ namespace PresetVersionCheck
 
         private void button2_Click(object sender, EventArgs e)
         {
+            string defaultDir = string.Empty;
+
+            defaultDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\downloads\\";
+            openFileDialog1.InitialDirectory = defaultDir;
+            openFileDialog1.FileName = string.Empty;
+            openFileDialog1.DefaultExt = "*.mpt";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 GetiItDone();
